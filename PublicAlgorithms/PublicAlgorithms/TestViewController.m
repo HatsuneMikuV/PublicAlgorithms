@@ -8,6 +8,8 @@
 
 #import "TestViewController.h"
 
+#import <Masonry.h>
+
 @interface TestViewController ()
 
 @end
@@ -23,7 +25,44 @@
     [self startAlgorithm];
 }
 - (void)startAlgorithm {
-    
+    switch (self.type) {
+        case 0:
+            [self bubbleSort];
+            break;
+        case 1:
+            [self bubbleSort];
+            break;
+        case 2:
+            [self bubbleSort];
+            break;
+        case 3:
+            [self bubbleSort];
+            break;
+        case 4:
+            [self bubbleSort];
+            break;
+        case 5:
+            [self bubbleSort];
+            break;
+        case 6:
+            [self bubbleSort];
+            break;
+        case 7:
+            [self bubbleSort];
+            break;
+        case 8:
+            [self bubbleSort];
+            break;
+        case 9:
+            [self bubbleSort];
+            break;
+        case 10:
+            [self bubbleSort];
+            break;
+            
+        default:
+            break;
+    }
 }
 #pragma mark -
 #pragma mark   ==============算法==============
