@@ -52,6 +52,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (indexPath.row < self.algorithmNameArr.count) {
         cell.textLabel.text = [NSString stringWithFormat:@"%@",self.algorithmNameArr[indexPath.row]];
+        cell.textLabel.font = [UIFont systemFontOfSize:15];
     }
     return cell;
 }

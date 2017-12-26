@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+#import <UIKit/UIKit.h>
+
+
 @interface Tool : NSObject
 //内存使用值
 + (unsigned long)memoryUsage;
@@ -15,4 +18,14 @@
 + (float)cpuUsage;
 //方法耗时
 + (double)functionTime:(void(^)(void))functionBlock;
+@end
+
+@interface ToolKLine : UIView
+//cpu 折线
++ (ToolKLine *)toolCpuKLineWithFrame:(CGRect)frame;
+//内存 折线
++ (ToolKLine *)toolMemoryKLineWithFrame:(CGRect)frame;
+//绘制折线
+- (void)dravLine:(BOOL)type withArr:(NSArray *)dataArr;
+
 @end

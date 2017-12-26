@@ -10,7 +10,18 @@
 
 #import <Masonry.h>
 
+#import "Tool.h"
+
 @interface TestViewController ()
+
+@property (nonatomic, strong) NSMutableArray *sortArr;
+
+@property (nonatomic, strong) UILabel *arrL;
+@property (nonatomic, strong) UILabel *timeL;
+@property (nonatomic, strong) ToolKLine *memory;
+@property (nonatomic, strong) ToolKLine *cpu;
+
+@property (nonatomic, strong) UIButton *sortBtn;
 
 @end
 
@@ -22,8 +33,47 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    [self startAlgorithm];
+    [self initSubLabel];
+    
 }
+- (void)initSubLabel {
+    switch (self.type) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:{
+            
+        }
+            break;
+        case 4:
+            [self bubbleSort];
+            break;
+        case 5:
+            [self bubbleSort];
+            break;
+        case 6:
+            [self bubbleSort];
+            break;
+        case 7:
+            [self bubbleSort];
+            break;
+        case 8:
+            [self bubbleSort];
+            break;
+        case 9:
+            [self bubbleSort];
+            break;
+        case 10:
+            [self bubbleSort];
+            break;
+            
+        default:
+            break;
+    }
+    
+    
+}
+
 - (void)startAlgorithm {
     switch (self.type) {
         case 0:
@@ -99,6 +149,8 @@
 - (void)findGreatestCommonDivisorOfTwoIntegers {
     
 }
+#pragma mark -
+#pragma mark   ==============lazy==============
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

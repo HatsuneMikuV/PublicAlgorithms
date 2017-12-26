@@ -11,5 +11,6 @@
 @interface TestViewController : UIViewController
 
 @property (nonatomic, assign) NSInteger type;
+@property (nonatomic, copy) NSString *titleName;
 
 @end
