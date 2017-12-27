@@ -74,10 +74,20 @@
         }
             break;
         case 9:
-            [self Sort];
             break;
         case 10:
-            [self Sort];
+            break;
+        case 11:
+            break;
+        case 12:
+            break;
+        case 13:
+            break;
+        case 14:
+            break;
+        case 15:
+            break;
+        case 16:
             break;
             
         default:
@@ -99,10 +109,20 @@
             [self Sort];
             break;
         case 9:
-            [self Sort];
             break;
         case 10:
-            [self Sort];
+            break;
+        case 11:
+            break;
+        case 12:
+            break;
+        case 13:
+            break;
+        case 14:
+            break;
+        case 15:
+            break;
+        case 16:
             break;
             
         default:
@@ -142,7 +162,7 @@
             arr = [self insertionAscendingHalfSort:arr1];
         }
     }];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self startOrEndAnimation:NO];
         self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
         [self.memory dravLineWithArr:self.memoryArr];
@@ -447,13 +467,10 @@
             return;
         }else {
             self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-            
             dispatch_source_set_timer(self.timer, dispatch_walltime(NULL, 0), 0.1 * NSEC_PER_SEC, 0);
-            
             dispatch_source_set_event_handler(self.timer, ^{
                 [self startRecord];
             });
-            
             dispatch_resume(self.timer);
         }
     }else {
@@ -542,19 +559,5 @@
     }
     return _cpu;
 }
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
