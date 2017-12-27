@@ -53,7 +53,13 @@
         case 0:
         case 1:
         case 2:
-        case 3:{
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        {
             self.arrL.text = [NSString stringWithFormat:@"数组：(看控制台)"];
             [self.arrL mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.left.equalTo(self.view.mas_left).offset(16);
@@ -66,21 +72,6 @@
                 make.size.mas_equalTo(CGSizeMake(80, 35));
             }];
         }
-            break;
-        case 4:
-            [self Sort];
-            break;
-        case 5:
-            [self Sort];
-            break;
-        case 6:
-            [self Sort];
-            break;
-        case 7:
-            [self Sort];
-            break;
-        case 8:
-            [self Sort];
             break;
         case 9:
             [self Sort];
@@ -100,20 +91,10 @@
         case 1:
         case 2:
         case 3:
-            [self Sort];
-            break;
         case 4:
-            [self Sort];
-            break;
         case 5:
-            [self Sort];
-            break;
         case 6:
-            [self Sort];
-            break;
         case 7:
-            [self Sort];
-            break;
         case 8:
             [self Sort];
             break;
@@ -134,17 +115,31 @@
     [self.memoryArr removeAllObjects];
     [self.cpuArr removeAllObjects];
     [self startOrEndAnimation:YES];
-    __block NSMutableArray *arr = self.sortArr.mutableCopy;
-    NSLog(@"未排序数组：\n%@",[arr componentsJoinedByString:@","]);
+    __block NSMutableArray *arr;
+    NSMutableArray *arr1 = self.sortArr.mutableCopy;
+    NSLog(@"未排序数组：\n%@",[arr1 componentsJoinedByString:@","]);
     double time = [Tool functionTime:^{
         if (self.type == 0) {
-            [self bubbleSort:arr];
+            [self bubbleSort:arr1];
+            arr = arr1;
         }else if (self.type == 1) {
-            [self selectSort:arr];
+            [self selectSort:arr1];
+            arr = arr1;
         }else if (self.type == 2) {
-            [self quickSortArray:arr withLeftIndex:0 andRightIndex:arr.count - 1];
+            [self quickSortArray:arr1 withLeftIndex:0 andRightIndex:arr1.count - 1];
+            arr = arr1;
         }else if (self.type == 3) {
-            arr = [self mergeSort:arr];
+            arr = [self mergeSort:arr1];
+        }else if (self.type == 4) {
+            arr = [self shellAscendingOrderSort:arr1];
+        }else if (self.type == 5) {
+            arr = [self radixAscendingOrderSort:arr1];
+        }else if (self.type == 6) {
+            arr = [self heapsortAsendingOrderSort:arr1];
+        }else if (self.type == 7) {
+            arr = [self insertionAscendingOrderSort:arr1];
+        }else if (self.type == 8) {
+            arr = [self insertionAscendingHalfSort:arr1];
         }
     }];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -172,6 +167,7 @@
 }
 #pragma mark -
 #pragma mark   ==============算法==============
+//冒泡排序
 - (void)bubbleSort:(NSMutableArray *)arr {
     for (int i = 0; i < arr.count - 1; i++) {
         for (int j = 0; j < arr.count - 1 - i; j++) {
@@ -181,6 +177,7 @@
         }
     }
 }
+//选择排序
 - (void)selectSort:(NSMutableArray *)arr {
     int i, j, index;
     for(i = 0; i < arr.count - 1; i++) {
@@ -195,6 +192,7 @@
         }
     }
 }
+//快速排序
 - (void)quickSortArray:(NSMutableArray *)array withLeftIndex:(NSInteger)leftIndex andRightIndex:(NSInteger)rightIndex {
     if (leftIndex >= rightIndex) {
         return ;
@@ -216,6 +214,7 @@
     [self quickSortArray:array withLeftIndex:leftIndex andRightIndex:i - 1];
     [self quickSortArray:array withLeftIndex:i + 1 andRightIndex:rightIndex];
 }
+//归并排序
 - (NSMutableArray *)mergeSort:(NSMutableArray *)arr{
     NSMutableArray *tempArray = [NSMutableArray array];
     for (NSString *number in arr) {
@@ -255,6 +254,161 @@
         secondIndex += 1;
     }
     return resultArray;
+}
+//希尔排序
+- (NSMutableArray *)shellAscendingOrderSort:(NSMutableArray *)ascendingArr {
+    NSMutableArray *buckt = [self createBucket];
+    NSString *maxnumber = [self listMaxItem:ascendingArr];
+    NSInteger maxLength = maxnumber.length;
+    for (int digit = 1; digit <= maxLength; digit++) {
+        // 入桶
+        for (NSString *item in ascendingArr) {
+            NSInteger baseNumber = [self fetchBaseNumber:item digit:digit];
+            NSMutableArray *mutArray = buckt[baseNumber];
+            [mutArray addObject:item];
+        }
+        NSInteger index = 0;
+        for (int i = 0; i < buckt.count; i++) {
+            NSMutableArray *array = buckt[i];
+            while (array.count != 0) {
+                NSString *number = [array objectAtIndex:0];
+                ascendingArr[index] = number;
+                [array removeObjectAtIndex:0];
+                index++;
+            }
+        }
+    }
+    return ascendingArr;
+}
+//基数排序
+- (NSMutableArray *)radixAscendingOrderSort:(NSMutableArray *)ascendingArr {
+    NSMutableArray *buckt = [self createBucket];
+    NSString *maxnumber = [self listMaxItem:ascendingArr];
+    NSInteger maxLength = maxnumber.length;
+    for (int digit = 1; digit <= maxLength; digit++) {
+        for (NSString *item in ascendingArr) {
+            NSInteger baseNumber = [self fetchBaseNumber:item digit:digit];
+            NSMutableArray *mutArray = buckt[baseNumber];
+            [mutArray addObject:item];
+        }
+        NSInteger index = 0;
+        for (int i = 0; i < buckt.count; i++) {
+            NSMutableArray *array = buckt[i];
+            while (array.count != 0) {
+                NSString *number = [array objectAtIndex:0];
+                ascendingArr[index] = number;
+                [array removeObjectAtIndex:0];
+                index++;
+            }
+        }
+    }
+    return ascendingArr;
+}
+- (NSMutableArray *)createBucket {
+    NSMutableArray *bucket = [NSMutableArray array];
+    for (int index = 0; index < 10; index++) {
+        NSMutableArray *array = [NSMutableArray array];
+        [bucket addObject:array];
+    }
+    return bucket;
+}
+- (NSString *)listMaxItem:(NSArray *)list {
+    NSString *maxNumber = list[0];
+    for (NSString *number in list) {
+        if ([maxNumber integerValue] < [number integerValue]) {
+            maxNumber = number;
+        }
+    }
+    return maxNumber;
+}
+- (NSInteger)fetchBaseNumber:(NSString *)number digit:(NSInteger)digit {
+    if (digit > 0 && digit <= number.length) {
+        NSMutableArray *numbersArray = [NSMutableArray array];
+        NSString *string = [NSString stringWithFormat:@"%@", number];
+        for (int index = 0; index < number.length; index++) {
+            [numbersArray addObject:[string substringWithRange:NSMakeRange(index, 1)]];
+        }
+        NSString *str = numbersArray[numbersArray.count - digit];
+        return [str integerValue];
+    }
+    return 0;
+}
+// 堆排序
+- (NSMutableArray *)heapsortAsendingOrderSort:(NSMutableArray *)ascendingArr {
+    NSInteger endIndex = ascendingArr.count - 1;
+    ascendingArr = [self heapCreate:ascendingArr];
+    while (endIndex >= 0) {
+        NSString *temp = ascendingArr[0];
+        ascendingArr[0] = ascendingArr[endIndex];
+        ascendingArr[endIndex] = temp;
+        endIndex -= 1;
+        ascendingArr = [self heapAdjast:ascendingArr withStartIndex:0 withEndIndex:endIndex + 1];
+    }
+    return ascendingArr;
+}
+- (NSMutableArray *)heapCreate:(NSMutableArray *)array {
+    NSInteger i = array.count;
+    while (i > 0) {
+        array = [self heapAdjast:array withStartIndex:i - 1 withEndIndex:array.count];
+        i -= 1;
+    }
+    return array;
+}
+- (NSMutableArray *)heapAdjast:(NSMutableArray *)items withStartIndex:(NSInteger)startIndex withEndIndex:(NSInteger)endIndex {
+    NSString *temp = items[startIndex];
+    NSInteger fatherIndex = startIndex + 1;
+    NSInteger maxChildIndex = 2 * fatherIndex;
+    while (maxChildIndex <= endIndex) {
+        if (maxChildIndex < endIndex && [items[maxChildIndex - 1] floatValue] < [items[maxChildIndex] floatValue]) {
+            maxChildIndex++;
+        }
+        if ([temp floatValue] < [items[maxChildIndex - 1] floatValue]) {
+            items[fatherIndex - 1] = items[maxChildIndex - 1];
+        } else {
+            break;
+        }
+        fatherIndex = maxChildIndex;
+        maxChildIndex = fatherIndex * 2;
+    }
+    items[fatherIndex - 1] = temp;
+    return items;
+}
+// 直接插入排序
+- (NSMutableArray *)insertionAscendingOrderSort:(NSMutableArray *)ascendingArr {
+    for (NSInteger i = 1; i < ascendingArr.count; i ++) {
+        NSInteger temp = [ascendingArr[i] integerValue];
+        for (NSInteger j = i - 1; j >= 0 && temp < [ascendingArr[j] integerValue]; j --) {
+            ascendingArr[j + 1] = ascendingArr[j];
+            ascendingArr[j] = [NSString stringWithFormat:@"%ld",temp];
+        }
+    }
+    return ascendingArr;
+}
+//二分法插入排序
+- (NSMutableArray *)insertionAscendingHalfSort:(NSMutableArray *)dataArr {
+    for (int i = 1; i < dataArr.count; i++) {
+        int left = 0;
+        int right = i - 1;
+        int mid;
+        int temp = [dataArr[i] intValue];
+        if (temp  < [dataArr[right] intValue]) {
+            while (left <= right) {
+                mid = (left + right) / 2;
+                if ([dataArr[mid] intValue] < temp) {
+                    left = mid + 1;
+                }else if ([dataArr[mid] intValue] > temp) {
+                    right = mid - 1;
+                }else {
+                    left += 1;
+                }
+            }
+            for (int j = i; j > left; j--) {
+                [dataArr exchangeObjectAtIndex:j-1 withObjectAtIndex:j];
+            }
+            dataArr[left] = [NSString stringWithFormat:@"%d",temp];
+        }
+    }
+    return dataArr;
 }
 - (void)binarySearch {
     
