@@ -38,10 +38,12 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    for (int index = 0; index < 5000; index++) {
-        NSString *num = [NSString stringWithFormat:@"%d",(arc4random()%5000)];
+    int count = self.type > 8 ? 10000:5000;
+    
+    for (int index = 0; index < count; index++) {
+        NSString *num = [NSString stringWithFormat:@"%d",(arc4random()%count)];
         [self.sortArr addObject:num];
-        if (index == 4999) {
+        if (index == count - 1) {
             self.sortBtn.enabled = YES;
         }
     }
@@ -73,7 +75,19 @@
             }];
         }
             break;
-        case 9:
+        case 9:{
+            self.arrL.text = [NSString stringWithFormat:@"数组：(看控制台)"];
+            [self.arrL mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.left.equalTo(self.view.mas_left).offset(16);
+                make.right.equalTo(self.view.mas_right).offset(-16);
+                make.top.equalTo(self.view.mas_top).offset(89);
+            }];
+            [self.sortBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+                make.centerX.equalTo(self.view.mas_centerX);
+                make.top.equalTo(self.arrL.mas_bottom).offset(25);
+                make.size.mas_equalTo(CGSizeMake(80, 35));
+            }];
+        }
             break;
         case 10:
             break;
@@ -95,7 +109,6 @@
     }
 }
 - (void)startAlgorithm {
-    self.sortBtn.enabled = NO;
     switch (self.type) {
         case 0:
         case 1:
@@ -105,10 +118,14 @@
         case 5:
         case 6:
         case 7:
-        case 8:
+        case 8:{
+            self.sortBtn.enabled = NO;
             [self Sort];
+        }
             break;
-        case 9:
+        case 9:{
+            [self binarySearch];
+        }
             break;
         case 10:
             break;
@@ -162,11 +179,11 @@
             arr = [self insertionAscendingHalfSort:arr1];
         }
     }];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self startOrEndAnimation:NO];
         self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
-        [self.memory dravLineWithArr:self.memoryArr];
-        [self.cpu dravLineWithArr:self.cpuArr];
+        [self.memory dravLineWithArr:self.memoryArr withColor:nil];
+        [self.cpu dravLineWithArr:self.cpuArr withColor:nil];
         [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(self.view.mas_left).offset(16);
             make.right.equalTo(self.view.mas_right).offset(-16);
@@ -183,6 +200,42 @@
             make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
         }];
         NSLog(@"排序完成数组：\n%@",[arr componentsJoinedByString:@","]);
+    });
+}
+- (void)binarySearch {
+    [self.memoryArr removeAllObjects];
+    [self.cpuArr removeAllObjects];
+    [self startOrEndAnimation:YES];
+    NSMutableArray *arr = [self shellAscendingOrderSort:self.sortArr];
+    __block NSInteger index = 0;
+    NSLog(@"未查找位置：%ld",index);
+    double time = [Tool functionTime:^{
+        index = [self binarySearch:arr];
+    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self startOrEndAnimation:NO];
+        self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
+        UIColor *color = self.sortBtn.tag == 2 ? [UIColor blueColor]:(self.sortBtn.tag == 1 ?[UIColor orangeColor]:nil);
+        [self.memory dravLineWithArr:self.memoryArr  withColor:color];
+        [self.cpu dravLineWithArr:self.cpuArr  withColor:color];
+        [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.view.mas_left).offset(16);
+            make.right.equalTo(self.view.mas_right).offset(-16);
+            make.top.equalTo(self.sortBtn.mas_bottom).offset(25);
+        }];
+        [self.memory.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.timeL.mas_bottom).offset(30);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        [self.cpu.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        self.sortBtn.tag ++;
+        self.sortBtn.enabled = !(self.sortBtn.tag == 3);
+        NSLog(@"查找的位置：%ld",index);
     });
 }
 #pragma mark -
@@ -430,9 +483,51 @@
     }
     return dataArr;
 }
-- (void)binarySearch {
-    
+//二分查找
+- (NSInteger)binarySearch:(NSMutableArray *)sortedArray {
+    NSString *searchObject = sortedArray[6666];
+    if (self.sortBtn.tag == 0) {
+        NSRange searchRange = NSMakeRange(0, [sortedArray count]);
+        NSUInteger findIndex = [sortedArray indexOfObject:searchObject
+                                            inSortedRange:searchRange
+                                                  options:NSBinarySearchingFirstEqual
+                                          usingComparator:^(id obj1, id obj2) {
+                                              return [obj1 compare:obj2];
+                                          }];
+        return findIndex;
+    }else if (self.sortBtn.tag == 1) {
+        unsigned index = (unsigned)CFArrayBSearchValues((CFArrayRef)sortedArray,
+                                                        CFRangeMake(0, CFArrayGetCount((CFArrayRef)sortedArray)),
+                                                        (CFStringRef)searchObject,
+                                                        (CFComparatorFunction)CFStringCompare,
+                                                        NULL);
+        if (index < [sortedArray count] && [searchObject isEqualToString:sortedArray[index]]) {
+            return index;
+        } else {
+            return -1;
+        }
+    }else if (self.sortBtn.tag == 2) {
+        NSUInteger mid;
+        NSUInteger min = 0;
+        NSUInteger max = [sortedArray count] - 1;
+        BOOL found = NO;
+        while (min <= max) {
+            mid = (min + max)/2;
+            if ([searchObject isEqualToString:sortedArray[mid]]) {
+                return mid;
+            } else if ([searchObject intValue] < [sortedArray[mid] intValue]) {
+                max = mid - 1;
+            } else if ([searchObject intValue] > [sortedArray[mid] intValue]) {
+                min = mid + 1;
+            }
+        }
+        if (!found) {
+            return -1;
+        }
+    }
+    return -1;
 }
+//链表逆序
 - (void)linkedListInversion {
     
 }
@@ -477,7 +572,6 @@
         if (self.timer) {
             dispatch_cancel(self.timer);
             self.timer = nil;
-            [self startRecord];
         }
     }
 }
@@ -525,6 +619,7 @@
         [_sortBtn setTitle:@"开始" forState:UIControlStateNormal];
         [_sortBtn setTitleColor:[UIColor purpleColor] forState:UIControlStateNormal];
         _sortBtn.backgroundColor = [UIColor cyanColor];
+        _sortBtn.tag = 0;
         [_sortBtn addTarget:self action:@selector(startAlgorithm) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview:_sortBtn];
         _sortBtn.enabled = NO;

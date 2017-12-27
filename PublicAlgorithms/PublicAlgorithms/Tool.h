@@ -30,6 +30,6 @@
 //内存 折线
 + (ToolKLine *)toolMemoryKLineWithFrame:(CGRect)frame;
 //绘制折线
-- (void)dravLineWithArr:(NSArray *)dataArr;
+- (void)dravLineWithArr:(NSArray *)dataArr withColor:(UIColor *)color;
 
 @end

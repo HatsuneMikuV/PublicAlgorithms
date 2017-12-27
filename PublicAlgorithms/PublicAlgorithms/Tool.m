@@ -101,7 +101,7 @@ static CGFloat bounceY = 20;
 }
 
 #pragma mark 画折线图
-- (void)dravLineWithArr:(NSArray *)dataArr {
+- (void)dravLineWithArr:(NSArray *)dataArr  withColor:(UIColor *)color{
     UIBezierPath * path = [[UIBezierPath alloc]init];
     path.lineWidth = 1.0;
     //创建折现点标记
@@ -121,7 +121,8 @@ static CGFloat bounceY = 20;
     }
     CAShapeLayer *lineChartLayer = [CAShapeLayer layer];
     lineChartLayer.path = path.CGPath;
-    lineChartLayer.strokeColor = [UIColor greenColor].CGColor;
+    color = color ? color:[UIColor greenColor];
+    lineChartLayer.strokeColor = color.CGColor;
     lineChartLayer.fillColor = [[UIColor clearColor] CGColor];
     // 默认设置路径宽度为0，使其在起始状态下不显示
     lineChartLayer.lineWidth = 0;
