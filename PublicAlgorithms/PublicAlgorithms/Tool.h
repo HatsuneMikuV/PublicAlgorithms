@@ -11,6 +11,10 @@
 #import <UIKit/UIKit.h>
 
 
+#define kWidth ([UIScreen mainScreen].bounds.size.width)
+#define kHeight ([UIScreen mainScreen].bounds.size.height)
+
+
 @interface Tool : NSObject
 //内存使用值
 + (unsigned long)memoryUsage;
@@ -26,6 +30,6 @@
 //内存 折线
 + (ToolKLine *)toolMemoryKLineWithFrame:(CGRect)frame;
 //绘制折线
-- (void)dravLine:(BOOL)type withArr:(NSArray *)dataArr;
+- (void)dravLineWithArr:(NSArray *)dataArr;
 
 @end

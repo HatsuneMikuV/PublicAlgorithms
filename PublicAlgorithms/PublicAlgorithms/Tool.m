@@ -22,7 +22,7 @@
     if (kr != KERN_SUCCESS) {
         return -1;
     }
-    unsigned long memorySize = info.resident_size >> 10;
+    unsigned long memorySize = info.resident_size >> 10 >> 10;
     
     return memorySize;
 }
@@ -101,27 +101,27 @@ static CGFloat bounceY = 20;
 }
 
 #pragma mark 画折线图
-- (void)dravLine:(BOOL)type withArr:(NSArray *)dataArr {
+- (void)dravLineWithArr:(NSArray *)dataArr {
     UIBezierPath * path = [[UIBezierPath alloc]init];
     path.lineWidth = 1.0;
-    [path moveToPoint:CGPointMake(0, 0)];
     //创建折现点标记
     CGFloat height = self.frame.size.height - 2 * bounceY;
     CGFloat width = self.frame.size.width - 2.5 * bounceX;
 
+    [path moveToPoint:CGPointMake(bounceX * 0.5, height)];
     for (NSInteger i = 1; i< dataArr.count; i++) {
-        NSNumber *num = dataArr[i];
+        NSString *num = dataArr[i];
         CGPoint point;
         if (self.type == 1) {
-            point = CGPointMake( width * 0.1 * (i+1) + bounceX, num.floatValue * 0.002 * height);
+            point = CGPointMake( width * 0.02 * (i+1) + 1.5 * bounceX, (1 - num.floatValue / 500) * height);
         }else {
-            point = CGPointMake( width * 0.1 * (i+1) + bounceX, num.floatValue * 0.01 * height);
+            point = CGPointMake( width * 0.02 * (i+1) + 1.5 * bounceX, (1 - num.floatValue * 0.01) * height);
         }
         [path addLineToPoint:point];
     }
     CAShapeLayer *lineChartLayer = [CAShapeLayer layer];
     lineChartLayer.path = path.CGPath;
-    lineChartLayer.strokeColor = [UIColor redColor].CGColor;
+    lineChartLayer.strokeColor = [UIColor greenColor].CGColor;
     lineChartLayer.fillColor = [[UIColor clearColor] CGColor];
     // 默认设置路径宽度为0，使其在起始状态下不显示
     lineChartLayer.lineWidth = 0;
@@ -130,7 +130,7 @@ static CGFloat bounceY = 20;
     lineChartLayer.frame = CGRectMake(bounceX, bounceY, self.bounds.size.width - bounceX*2, self.bounds.size.height - 2*bounceY);
     [self.layer addSublayer:lineChartLayer];//直接添加导视图上
     
-    lineChartLayer.lineWidth = 2;
+    lineChartLayer.lineWidth = 1.f;
     CABasicAnimation *pathAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
     pathAnimation.duration = 3;
     pathAnimation.repeatCount = 1;
@@ -141,7 +141,7 @@ static CGFloat bounceY = 20;
 }
 #pragma mark 创建x轴的数据
 - (void)createLabelX{
-    CGFloat  month = 10;
+    CGFloat  month = 50;
     for (NSInteger i = 0; i < month; i++) {
         UILabel * LabelMonth = [[UILabel alloc]initWithFrame:
                                 CGRectMake((self.frame.size.width - 2.5*bounceX)/month * (i+1) + bounceX, self.frame.size.height - bounceY + bounceY*0.3, (self.frame.size.width - 2.5*bounceX)/month- 5, bounceY/2)];
