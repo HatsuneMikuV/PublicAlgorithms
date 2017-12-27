@@ -39,7 +39,7 @@
     self.view.backgroundColor = [UIColor whiteColor];
     
     for (int index = 0; index < 5000; index++) {
-        NSString *num = [NSString stringWithFormat:@"%d",(arc4random()%100)];
+        NSString *num = [NSString stringWithFormat:@"%d",(arc4random()%5000)];
         [self.sortArr addObject:num];
         if (index == 4999) {
             self.sortBtn.enabled = YES;
@@ -68,25 +68,25 @@
         }
             break;
         case 4:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 5:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 6:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 7:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 8:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 9:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 10:
-            [self bubbleSort];
+            [self Sort];
             break;
             
         default:
@@ -94,39 +94,34 @@
     }
 }
 - (void)startAlgorithm {
+    self.sortBtn.enabled = NO;
     switch (self.type) {
         case 0:
-            [self bubbleSort];
-            break;
         case 1:
-            [self bubbleSort];
-            break;
         case 2:
-            [self bubbleSort];
-            break;
         case 3:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 4:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 5:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 6:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 7:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 8:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 9:
-            [self bubbleSort];
+            [self Sort];
             break;
         case 10:
-            [self bubbleSort];
+            [self Sort];
             break;
             
         default:
@@ -134,22 +129,22 @@
     }
 }
 #pragma mark -
-#pragma mark   ==============算法==============
-- (void)bubbleSort {
+#pragma mark   ==============算法调用==============
+- (void)Sort{
     [self.memoryArr removeAllObjects];
     [self.cpuArr removeAllObjects];
     [self startOrEndAnimation:YES];
-    NSMutableArray *arr = self.sortArr.mutableCopy;
-    NSLog(@"数组：\n%@",arr);
+    __block NSMutableArray *arr = self.sortArr.mutableCopy;
+    NSLog(@"未排序数组：\n%@",[arr componentsJoinedByString:@","]);
     double time = [Tool functionTime:^{
-        for (int i = 0; i < arr.count - 1; i++) {
-            for (int j = 0; j < arr.count - 1 - i; j++) {
-                if ([arr[j] intValue] > [arr[j+1] intValue]) {
-                    NSString *tmp = arr[j];
-                    arr[j] = arr[j+1];
-                    arr[j+1] = tmp;
-                }
-            }
+        if (self.type == 0) {
+            [self bubbleSort:arr];
+        }else if (self.type == 1) {
+            [self selectSort:arr];
+        }else if (self.type == 2) {
+            [self quickSortArray:arr withLeftIndex:0 andRightIndex:arr.count - 1];
+        }else if (self.type == 3) {
+            arr = [self mergeSort:arr];
         }
     }];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -172,16 +167,94 @@
             make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
             make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
         }];
+        NSLog(@"排序完成数组：\n%@",[arr componentsJoinedByString:@","]);
     });
 }
-- (void)selectSort {
-    
+#pragma mark -
+#pragma mark   ==============算法==============
+- (void)bubbleSort:(NSMutableArray *)arr {
+    for (int i = 0; i < arr.count - 1; i++) {
+        for (int j = 0; j < arr.count - 1 - i; j++) {
+            if ([arr[j] intValue] > [arr[j+1] intValue]) {
+                [arr exchangeObjectAtIndex:j withObjectAtIndex:j+1];
+            }
+        }
+    }
 }
-- (void)quickSort {
-    
+- (void)selectSort:(NSMutableArray *)arr {
+    int i, j, index;
+    for(i = 0; i < arr.count - 1; i++) {
+        index = i;
+        for(j = i + 1; j < arr.count; j++) {
+            if([arr[index] intValue] > [arr[j] intValue]) {
+                index = j;
+            }
+        }
+        if(index != i) {
+            [arr exchangeObjectAtIndex:i withObjectAtIndex:index];
+        }
+    }
 }
-- (void)mergeSort {
-    
+- (void)quickSortArray:(NSMutableArray *)array withLeftIndex:(NSInteger)leftIndex andRightIndex:(NSInteger)rightIndex {
+    if (leftIndex >= rightIndex) {
+        return ;
+    }
+    NSInteger i = leftIndex;
+    NSInteger j = rightIndex;
+    NSInteger key = [array[i] integerValue];
+    while (i < j) {
+        while (i < j && [array[j] integerValue] >= key) {
+            j--;
+        }
+        array[i] = array[j];
+        while (i < j && [array[i] integerValue] <= key) {
+            i++;
+        }
+        array[j] = array[i];
+    }
+    array[i] = [NSString stringWithFormat:@"%ld",key];
+    [self quickSortArray:array withLeftIndex:leftIndex andRightIndex:i - 1];
+    [self quickSortArray:array withLeftIndex:i + 1 andRightIndex:rightIndex];
+}
+- (NSMutableArray *)mergeSort:(NSMutableArray *)arr{
+    NSMutableArray *tempArray = [NSMutableArray array];
+    for (NSString *number in arr) {
+        NSMutableArray *childArray = [NSMutableArray array];
+        [childArray addObject:number];
+        [tempArray addObject:childArray];
+    }
+    while (tempArray.count != 1) {
+        NSUInteger i = 0;
+        while (i < tempArray.count - 1) {
+            tempArray[i] = [self mergeArray:tempArray[i] secondArray:tempArray[i+1]];
+            [tempArray removeObjectAtIndex:i+1];
+            i += 1;
+        }
+    }
+    return tempArray;
+}
+- (NSMutableArray *)mergeArray:(NSArray *)firstArray secondArray:(NSArray *)secondArray {
+    NSMutableArray *resultArray = [NSMutableArray array];
+    NSUInteger firstIndex = 0;
+    NSUInteger secondIndex = 0;
+    while (firstIndex < firstArray.count && secondIndex < secondArray.count) {
+        if ([firstArray[firstIndex] integerValue] < [secondArray[secondIndex] integerValue]) {
+            [resultArray addObject:firstArray[firstIndex]];
+            firstIndex += 1;
+        }else {
+            [resultArray addObject:secondArray[secondIndex]];
+            secondIndex += 1;
+        }
+    }
+    while (firstIndex < firstArray.count) {
+        [resultArray addObject:firstArray[firstIndex]];
+        firstIndex += 1;
+    }
+    while (secondIndex < secondArray.count) {
+        [resultArray addObject:secondArray[secondIndex]];
+        secondIndex += 1;
+    }
+    return resultArray;
 }
 - (void)binarySearch {
     

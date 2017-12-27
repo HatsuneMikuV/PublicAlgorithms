@@ -113,7 +113,7 @@ static CGFloat bounceY = 20;
         NSString *num = dataArr[i];
         CGPoint point;
         if (self.type == 1) {
-            point = CGPointMake( width * 0.02 * (i+1) + 1.5 * bounceX, (1 - num.floatValue / 500) * height);
+            point = CGPointMake( width * 0.02 * (i+1) + 1.5 * bounceX, (1 - num.floatValue * 0.01) * height);
         }else {
             point = CGPointMake( width * 0.02 * (i+1) + 1.5 * bounceX, (1 - num.floatValue * 0.01) * height);
         }
@@ -160,7 +160,7 @@ static CGFloat bounceY = 20;
         UILabel * labelYdivision = [[UILabel alloc]initWithFrame:CGRectMake(0, (self.frame.size.height - 2 * bounceY)/Ydivision *i + bounceX, bounceY * 2, bounceY/2.0)];
         labelYdivision.tag = 2000 + i;
         if (self.type == 1) {
-            labelYdivision.text = [NSString stringWithFormat:@"%ldM",(Ydivision - i) * 100];
+            labelYdivision.text = [NSString stringWithFormat:@"%ldM",(Ydivision - i) * 20];
         }else {
             labelYdivision.text = [NSString stringWithFormat:@"%%%ld",(Ydivision - i) * 20];
         }
