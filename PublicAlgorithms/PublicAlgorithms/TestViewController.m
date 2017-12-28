@@ -12,6 +12,83 @@
 
 #import "Tool.h"
 
+
+typedef struct NODE {
+    struct NODE *next;
+    int num;
+}node;
+
+node *createLinkList(int length) {
+    if (length <= 0) {
+        return NULL;
+    }
+    node *head,*p,*q;
+    int number = 1;
+    head = (node *)malloc(sizeof(node));
+    head->num = 1;
+    head->next = head;
+    p = q = head;
+    while (++number <= length) {
+        p = (node *)malloc(sizeof(node));
+        p->num = number;
+        p->next = NULL;
+        q->next = p;
+        q = p;
+    }
+    return head;
+}
+void printLinkList(node *head) {
+    if (head == NULL) {
+        return;
+    }
+    node *p = head;
+    while (p) {
+        printf("%d ", p->num);
+        p = p -> next;
+    }
+    printf("\n");
+}
+node *reverseFunc1(node *head) {
+    if (head == NULL) {
+        return head;
+    }
+    node *p,*q;
+    p = head;
+    q = NULL;
+    while (p) {
+        node *pNext = p -> next;
+        p -> next = q;
+        q = p;
+        p = pNext;
+    }
+    return q;
+}
+
+int spliterFunc(char *p) {
+    char c[100][100];
+    int i = 0;
+    int j = 0;
+    while (*p != '\0') {
+        if (*p == ' ') {
+            i++;
+            j = 0;
+        } else {
+            c[i][j] = *p;
+            j++;
+        }
+        p++;
+    }
+    for (int k = i; k >= 0; k--) {
+        printf("%s", c[k]);
+        if (k > 0) {
+            printf(" ");
+        } else {
+            printf("\n");
+        }
+    }
+    return 0;
+}
+
 @interface TestViewController ()
 
 @property (nonatomic, strong) NSMutableArray *sortArr;
@@ -38,14 +115,18 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    int count = self.type > 8 ? 10000:5000;
-    
-    for (int index = 0; index < count; index++) {
-        NSString *num = [NSString stringWithFormat:@"%d",(arc4random()%count)];
-        [self.sortArr addObject:num];
-        if (index == count - 1) {
-            self.sortBtn.enabled = YES;
+    if (self.type <= 9) {
+        int count = self.type > 8 ? 10000:5000;
+        
+        for (int index = 0; index < count; index++) {
+            NSString *num = [NSString stringWithFormat:@"%d",(arc4random()%count)];
+            [self.sortArr addObject:num];
+            if (index == count - 1) {
+                self.sortBtn.enabled = YES;
+            }
         }
+    }else {
+        self.sortBtn.enabled = YES;
     }
     
     [self initSubLabel];
@@ -61,45 +142,24 @@
         case 6:
         case 7:
         case 8:
-        {
+        case 9:
             self.arrL.text = [NSString stringWithFormat:@"数组：(看控制台)"];
-            [self.arrL mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.view.mas_left).offset(16);
-                make.right.equalTo(self.view.mas_right).offset(-16);
-                make.top.equalTo(self.view.mas_top).offset(89);
-            }];
-            [self.sortBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.centerX.equalTo(self.view.mas_centerX);
-                make.top.equalTo(self.arrL.mas_bottom).offset(25);
-                make.size.mas_equalTo(CGSizeMake(80, 35));
-            }];
-        }
-            break;
-        case 9:{
-            self.arrL.text = [NSString stringWithFormat:@"数组：(看控制台)"];
-            [self.arrL mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(self.view.mas_left).offset(16);
-                make.right.equalTo(self.view.mas_right).offset(-16);
-                make.top.equalTo(self.view.mas_top).offset(89);
-            }];
-            [self.sortBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.centerX.equalTo(self.view.mas_centerX);
-                make.top.equalTo(self.arrL.mas_bottom).offset(25);
-                make.size.mas_equalTo(CGSizeMake(80, 35));
-            }];
-        }
             break;
         case 10:
+            self.arrL.text = [NSString stringWithFormat:@"链表逆序：(看控制台)"];
             break;
         case 11:
+            self.arrL.text = [NSString stringWithFormat:@"字符串逆序输出：(看控制台)"];
             break;
         case 12:
             break;
         case 13:
             break;
         case 14:
+            self.arrL.text = [NSString stringWithFormat:@"2-100之间素数：未计算"];
             break;
         case 15:
+            self.arrL.text = [NSString stringWithFormat:@"2465与8965的最大公约数：未计算"];
             break;
         case 16:
             break;
@@ -107,6 +167,17 @@
         default:
             break;
     }
+    
+    [self.arrL mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.view.mas_left).offset(16);
+        make.right.equalTo(self.view.mas_right).offset(-16);
+        make.top.equalTo(self.view.mas_top).offset(89);
+    }];
+    [self.sortBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.centerX.equalTo(self.view.mas_centerX);
+        make.top.equalTo(self.arrL.mas_bottom).offset(25);
+        make.size.mas_equalTo(CGSizeMake(80, 35));
+    }];
 }
 - (void)startAlgorithm {
     switch (self.type) {
@@ -128,16 +199,22 @@
         }
             break;
         case 10:
+            [self linkedListInversion];
             break;
         case 11:
+            [self reverseOrderOutputOfString];
             break;
         case 12:
             break;
         case 13:
             break;
-        case 14:
+        case 14:{
+            [self printPrimeNumber];
+        }
             break;
-        case 15:
+        case 15:{
+            [self findGreatestCommonDivisorOfTwoIntegers];
+        }
             break;
         case 16:
             break;
@@ -529,10 +606,73 @@
 }
 //链表逆序
 - (void)linkedListInversion {
-    
+    [self.memoryArr removeAllObjects];
+    [self.cpuArr removeAllObjects];
+    [self startOrEndAnimation:YES];
+    double time = [Tool functionTime:^{
+        node *head = createLinkList(7);
+        if (head) {
+            printLinkList(head);
+            node *reHead = reverseFunc1(head);
+            printLinkList(reHead);
+            free(reHead);
+        }
+        free(head);
+    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self startOrEndAnimation:NO];
+        self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
+        [self.memory dravLineWithArr:self.memoryArr  withColor:nil];
+        [self.cpu dravLineWithArr:self.cpuArr  withColor:nil];
+        [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.view.mas_left).offset(16);
+            make.right.equalTo(self.view.mas_right).offset(-16);
+            make.top.equalTo(self.sortBtn.mas_bottom).offset(25);
+        }];
+        [self.memory.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.timeL.mas_bottom).offset(30);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        [self.cpu.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        self.sortBtn.enabled = NO;
+    });
 }
+//字符串的逆序输出
 - (void)reverseOrderOutputOfString {
-    
+    [self.memoryArr removeAllObjects];
+    [self.cpuArr removeAllObjects];
+    [self startOrEndAnimation:YES];
+    double time = [Tool functionTime:^{
+        char *p = "hello world";
+        spliterFunc(p);
+    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self startOrEndAnimation:NO];
+        self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
+        [self.memory dravLineWithArr:self.memoryArr  withColor:nil];
+        [self.cpu dravLineWithArr:self.cpuArr  withColor:nil];
+        [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.view.mas_left).offset(16);
+            make.right.equalTo(self.view.mas_right).offset(-16);
+            make.top.equalTo(self.sortBtn.mas_bottom).offset(25);
+        }];
+        [self.memory.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.timeL.mas_bottom).offset(30);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        [self.cpu.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        self.sortBtn.enabled = NO;
+    });
 }
 - (void)findPositionOfOnlyOnceAndMostImportantCharacterString {
     
@@ -540,11 +680,99 @@
 - (void)binaryTree {
     
 }
+//打印2-100之间的素数
 - (void)printPrimeNumber {
-    
+    [self.memoryArr removeAllObjects];
+    [self.cpuArr removeAllObjects];
+    [self startOrEndAnimation:YES];
+    __block NSMutableArray *arr = [NSMutableArray array];
+    NSInteger a = 2;
+    NSInteger b = 100;
+    double time = [Tool functionTime:^{
+        for (NSInteger index = a; index < b; index++) {
+            if ([self isPrime:index]) {
+                [arr addObject:[NSString stringWithFormat:@"%ld",index]];
+            }
+        }
+    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self startOrEndAnimation:NO];
+        self.arrL.text = [NSString stringWithFormat:@"2-100之间素数：%@",[arr componentsJoinedByString:@","]];
+        self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
+        [self.memory dravLineWithArr:self.memoryArr  withColor:nil];
+        [self.cpu dravLineWithArr:self.cpuArr  withColor:nil];
+        [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.view.mas_left).offset(16);
+            make.right.equalTo(self.view.mas_right).offset(-16);
+            make.top.equalTo(self.sortBtn.mas_bottom).offset(25);
+        }];
+        [self.memory.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.timeL.mas_bottom).offset(30);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        [self.cpu.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        self.sortBtn.enabled = NO;
+    });
 }
+- (BOOL)isPrime:(NSInteger)num {
+    for (NSInteger i = 2; i <= sqrt(num); i++) {
+        if (num % i == 0) return NO;
+    }
+    return 1;
+}
+//求两个整数的最大公约数
 - (void)findGreatestCommonDivisorOfTwoIntegers {
-    
+    [self.memoryArr removeAllObjects];
+    [self.cpuArr removeAllObjects];
+    [self startOrEndAnimation:YES];
+    __block NSInteger index = 0;
+    NSInteger a = 2465;
+    NSInteger b = 8965;
+    double time = [Tool functionTime:^{
+        index = [self getGcd:a with:b];
+    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self startOrEndAnimation:NO];
+        self.arrL.text = [NSString stringWithFormat:@"2465与8965的最大公约数：%ld",index];
+        self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
+        [self.memory dravLineWithArr:self.memoryArr  withColor:nil];
+        [self.cpu dravLineWithArr:self.cpuArr  withColor:nil];
+        [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.view.mas_left).offset(16);
+            make.right.equalTo(self.view.mas_right).offset(-16);
+            make.top.equalTo(self.sortBtn.mas_bottom).offset(25);
+        }];
+        [self.memory.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.timeL.mas_bottom).offset(30);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        [self.cpu.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        self.sortBtn.enabled = NO;
+    });
+}
+- (NSInteger)getGcd:(NSInteger )a with:(NSInteger)b  {
+    NSInteger temp = 0;
+    if (a < b) {
+        temp = a;
+        a = b;
+        b = temp;
+    }
+    while (b != 0) {
+        temp = a % b;
+        a = b;
+        b = temp;
+    }
+    return a;
 }
 #pragma mark -
 #pragma mark   ==============记录cpu+memory==============
