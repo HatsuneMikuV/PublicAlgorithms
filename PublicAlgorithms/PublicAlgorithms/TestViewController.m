@@ -89,6 +89,31 @@ int spliterFunc(char *p) {
     return 0;
 }
 
+char findIt(const char *str) {
+    int count[26]={0};
+    int index[26]={0};  //注意int数组初始化赋值时，如果写成={-1}是不能给所有元素初始化为-1的，只有第一个元素是-1，其余为默认值0
+    unsigned int i;
+    int pos;
+    for(i=0;i<strlen(str);i++) {
+        count[str[i]-'a']++;   //记录该字母出现的次数
+        // cout<<count[str[i]-'a']<<endl;
+        if(index[str[i]-'a']==0) {
+            index[str[i]-'a']=i;  //记住该字母第一次出现时的索引
+        }
+    }
+    pos = (int)strlen(str);
+    for(i=0;i<26;i++) {
+        if(count[i]==1){  //找到只出现一次的字母
+            if(index[i]!=-1&&index[i]<pos){  //在只出现一次的字母中找出索引值最小的即可
+                pos=index[i];
+            }
+        }
+    }
+    if(pos<strlen(str))
+        return str[pos];
+    return '\0';
+}
+
 @interface TestViewController ()
 
 @property (nonatomic, strong) NSMutableArray *sortArr;
@@ -152,8 +177,10 @@ int spliterFunc(char *p) {
             self.arrL.text = [NSString stringWithFormat:@"字符串逆序输出：(看控制台)"];
             break;
         case 12:
+            self.arrL.text = [NSString stringWithFormat:@"查找字符串中只出现一次且最靠前的字符的位置：未计算"];
             break;
         case 13:
+            self.arrL.text = [NSString stringWithFormat:@"二叉树"];
             break;
         case 14:
             self.arrL.text = [NSString stringWithFormat:@"2-100之间素数：未计算"];
@@ -205,8 +232,10 @@ int spliterFunc(char *p) {
             [self reverseOrderOutputOfString];
             break;
         case 12:
+            [self findPositionOfOnlyOnceAndMostImportantCharacterString];
             break;
         case 13:
+            [self binaryTree];
             break;
         case 14:{
             [self printPrimeNumber];
@@ -674,11 +703,79 @@ int spliterFunc(char *p) {
         self.sortBtn.enabled = NO;
     });
 }
+//查找字符串中只出现一次且最靠前的字符的位置
 - (void)findPositionOfOnlyOnceAndMostImportantCharacterString {
-    
+    [self.memoryArr removeAllObjects];
+    [self.cpuArr removeAllObjects];
+    [self startOrEndAnimation:YES];
+    __block char s;
+    double time = [Tool functionTime:^{
+        char *p = "hello world flsnlnf hello world";
+        s = findIt(p);
+    }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self startOrEndAnimation:NO];
+        self.arrL.text = [NSString stringWithFormat:@"查找字符串中只出现一次且最靠前的字符的位置：%c",s];
+        self.timeL.text = [NSString stringWithFormat:@"耗时：%.8fs",time];
+        [self.memory dravLineWithArr:self.memoryArr  withColor:nil];
+        [self.cpu dravLineWithArr:self.cpuArr  withColor:nil];
+        [self.timeL mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.view.mas_left).offset(16);
+            make.right.equalTo(self.view.mas_right).offset(-16);
+            make.top.equalTo(self.sortBtn.mas_bottom).offset(25);
+        }];
+        [self.memory.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.timeL.mas_bottom).offset(30);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        [self.cpu.superview mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.view.mas_centerX);
+            make.top.equalTo(self.memory.superview.mas_bottom).offset(50);
+            make.size.mas_equalTo(CGSizeMake(kWidth - 32, 150));
+        }];
+        self.sortBtn.enabled = NO;
+    });
 }
+//二叉树
 - (void)binaryTree {
+    NSArray *arr = [NSArray arrayWithObjects:@(7),@(6),@(3),@(2),@(1),@(9),@(10),@(12),@(14),@(4),@(14), nil];
+    BinaryTreeNode *tree = [BinaryTreeNode new];
+    tree = [BinaryTreeNode createTreeWithValues:arr];
+    NSString *treeString = [tree printfBinaryTree];
     
+    BinaryTreeNode *tree1 = [BinaryTreeNode treeNodeAtIndex:3 inTree:tree];
+    NSString *tree1String = [tree1 printfBinaryTree];
+
+    NSMutableArray *orderArray = [NSMutableArray array];
+    [BinaryTreeNode preOrderTraverseTree:tree handler:^(BinaryTreeNode *treeNode) {
+        [orderArray addObject:@(treeNode.value)];
+    }];
+    NSString *startString = [NSString stringWithFormat:@"先序遍历结果：%@", [orderArray componentsJoinedByString:@","]];
+    
+    NSMutableArray *orderArray1 = [NSMutableArray array];
+    [BinaryTreeNode inOrderTraverseTree:tree handler:^(BinaryTreeNode *treeNode) {
+        
+        [orderArray1 addObject:@(treeNode.value)];
+        
+    }];
+    NSString *midString = [NSString stringWithFormat:@"中序遍历结果：%@", [orderArray1 componentsJoinedByString:@","]];
+
+    NSMutableArray *orderArray2 = [NSMutableArray array];
+    [BinaryTreeNode postOrderTraverseTree:tree handler:^(BinaryTreeNode *treeNode) {
+        [orderArray2 addObject:@(treeNode.value)];
+        
+    }];
+    NSString *endString = [NSString stringWithFormat:@"后序遍历结果：%@", [orderArray2 componentsJoinedByString:@","]];
+
+    NSMutableArray *orderArray3 = [NSMutableArray array];
+    [BinaryTreeNode levelTraverseTree:tree handler:^(BinaryTreeNode *treeNode) {
+        [orderArray3 addObject:@(treeNode.value)];
+        
+    }];
+    NSString *cengString = [NSString stringWithFormat:@"层次遍历结果：%@", [orderArray3 componentsJoinedByString:@","]];
+    
+    self.arrL.text = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@\n%@",treeString,tree1String,startString,midString,endString,cengString];
 }
 //打印2-100之间的素数
 - (void)printPrimeNumber {
